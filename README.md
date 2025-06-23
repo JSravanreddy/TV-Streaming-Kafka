@@ -14,6 +14,7 @@ A lightweight **end‑to‑end demo** that generates realistic Over‑The‑Top 
 ├── kafka_producer.py   # Sends those events to a Kafka topic
 ├── spark_consumer.py   # Structured Streaming job that reads from Kafka and writes Parquet
 ├── main.py             # One‑click runner that wires generator → producer → consumer
+├── prometheus.yml      # Prometheus scrape config for local monitoring
 └── README.md           # You are here 📝
 ```
 
@@ -127,6 +128,26 @@ python spark_consumer.py --topic tv_events
 | Push to a cloud Kafka (MSK, Confluent) | Flags in **kafka\_producer.py**                    |
 | Write to Delta Lake or Iceberg         | Replace `write.format("parquet")` in consumer      |
 | Show near‑real‑time dashboard          | Point **Apache Superset** or **Grafana** at output |
+
+## 📊 Monitoring & Observability
+
+1. **Prometheus** – A ready‑to‑use `prometheus.yml` is included. Start Prometheus and point it at the config:
+
+   ```bash
+   prometheus --config.file=prometheus.yml &
+   ```
+
+   It scrapes:
+
+   * **Kafka brokers** (via JMX exporter on `7071`)
+   * **Spark Structured Streaming** metrics (`4040/prometheus` when `spark.metrics.conf.*` is enabled)
+   * **Python generator/producer** (exposes `:8000/metrics` using `prometheus_client`)
+
+2. **Grafana (optional)** – Import the *Kafka Overview* and *Spark Streaming* dashboards or roll your own.
+
+> With metrics wired in, you can watch event throughput, lag, and processing latency in real time while you demo the pipeline.
+
+---
 
 Pull requests welcome—let’s make this the best tiny OTT pipeline on GitHub! 🎬🍿
 
